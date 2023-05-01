@@ -11,6 +11,7 @@ Original file is located at
 ## Importing Libraries
 """
 
+import re
 import tensorflow as tf
 import tensorflow_hub as hub
 from sklearn import linear_model
@@ -99,11 +100,11 @@ def extract_POS(sample_doc):
 def matching_keywords(stdlst,keylst):
         #matched list
         res=[]
-        #unmatched list
-        tmpres=[]
         for x in stdlst:
-            if (x in keylst):
-                res.append(x)
+            # res += list(set([key for key in keylst if re.search(x, key)]))
+            for key in keylst:
+                if(re.search(re.escape(x),re.escape(key))):
+                    res.append(key)
         return res
 
 def dictionary_with_weights(words):
@@ -162,7 +163,7 @@ def keyword_scoring(stud_ans,ans_key):
   if(type(stud_ans)==float):
     stud_ans=str(stud_ans)
 
-
+  print(keywords_scores)
   stud_doc=nlp(stud_ans) 
   std_POS=extract_POS(stud_doc)
   #then apply match function
@@ -193,6 +194,4 @@ def finalMarks(li):
 
 def descAnswerEval(ans,key):
     return finalMarks([sbert_cross(ans,key),roberta(ans),keyword_scoring(ans,key)])
-
-descAnswerEval("An OOP is a modular approach, which allows data to be applied on stipulated program area. It is a feature to develop productive emphasis on data . It also provides the reusability logic","Object-oriented programming (OOP) is a computer programming model that organizes software design around data, or objects, rather than functions and logic. It follows the bottom-up approach.")
 
